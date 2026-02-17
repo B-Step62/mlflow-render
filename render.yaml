@@ -30,10 +30,10 @@ services:
           name: mlflow-postgres
           property: connectionString
       - key: MLFLOW_ARTIFACTS_DESTINATION
-        value: s3://your-mlflow-bucket/
+        sync: false
       - key: AWS_ACCESS_KEY_ID
         sync: false
       - key: AWS_SECRET_ACCESS_KEY
         sync: false
       - key: AWS_DEFAULT_REGION
-        value: us-east-1
+        sync: false
