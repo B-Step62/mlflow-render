@@ -11,9 +11,10 @@ databases:
 services:
   - name: mlflow-server
     type: web
-    runtime: docker
+    runtime: python
     plan: starter
-    dockerfilePath: ./Dockerfile
+    buildCommand: pip install mlflow psycopg2-binary boto3
+    startCommand: mlflow server --backend-store-uri $MLFLOW_BACKEND_STORE_URI --artifacts-destination $MLFLOW_ARTIFACTS_DESTINATION --serve-artifacts --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
     envVars:
       - key: MLFLOW_BACKEND_STORE_URI
