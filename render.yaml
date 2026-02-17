@@ -1,0 +1,39 @@
+# render.yaml
+# MLflow on Render with AWS S3 for artifact storage
+
+databases:
+  - name: mlflow-postgres
+    plan: basic-256mb
+    postgresMajorVersion: "15"
+    databaseName: mlflow
+    user: mlflow
+
+services:
+  - name: mlflow-server
+    type: web
+    runtime: image
+    plan: starter
+    image:
+      url: ghcr.io/mlflow/mlflow:latest
+    dockerCommand: >
+      /bin/bash -c 'pip install --no-cache-dir psycopg2-binary boto3 &&
+      mlflow server
+      --backend-store-uri "$MLFLOW_BACKEND_STORE_URI"
+      --artifacts-destination "$MLFLOW_ARTIFACTS_DESTINATION"
+      --serve-artifacts
+      --host 0.0.0.0
+      --port 5000'
+    healthCheckPath: /health
+    envVars:
+      - key: MLFLOW_BACKEND_STORE_URI
+        fromDatabase:
+          name: mlflow-postgres
+          property: connectionString
+      - key: MLFLOW_ARTIFACTS_DESTINATION
+        value: s3://your-mlflow-bucket/
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: AWS_DEFAULT_REGION
+        value: us-east-1
